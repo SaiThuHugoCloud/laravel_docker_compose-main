@@ -1,5 +1,3 @@
-version: "3.8"
-
 networks:
   uniq:
     driver: bridge
@@ -8,7 +6,6 @@ networks:
         - subnet: 172.16.100.0/24
 
 services:
-
   nginx.uniq:
     build:
       context: ./
@@ -25,8 +22,8 @@ services:
       uniq:
         ipv4_address: 172.16.100.202
     ports:
-      - "80"
-      - "443"
+      - "80:80"
+      - "443:443"
 
   app.uniq:
     build:
@@ -38,7 +35,7 @@ services:
       uniq:
         ipv4_address: 172.16.100.100
     ports:
-      - "9000"
+      - "9001:9000"
 
   demo.uniq:
     image: app.uniq
@@ -52,7 +49,7 @@ services:
       uniq:
         ipv4_address: 172.16.100.101
     ports:
-      - "9000"
+      - "9000:9000"
 
   mariadb.uniq:
     image: mariadb:latest
@@ -61,24 +58,26 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_INITDB_SKIP_TZINFO: "yes"
       MYSQLD_ARGS: "--bind-address=0.0.0.0"
-#      MYSQLD_ARGS: "--bind-address=0.0.0.0, --sql_mode='NO_ENGINE_SUBSTITUTION'"
-    networks:
+      #MYSQLD_ARGS: "--bind-address=0.0.0.0, --sql_mode='NO_ENGINE_SUBSTITUTION'"  
+  networks:
       uniq:
         ipv4_address: 172.16.100.102
     volumes:
       - "./logs/mariadb:/var/log/mariadb"
       - "./mariadb/data:/var/lib/mysql"
     ports:
-      - "3306"
+      - "3306:3306"
 
   phpmyadmin.uniq:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin.uniq
     environment:
       PMA_HOST: mariadb.uniq
+      PMA_USER: root
       PMA_PASSWORD: password
     networks:
       uniq:
         ipv4_address: 172.16.100.103
     ports:
-      - "80"
+      - "8080:80"
+
